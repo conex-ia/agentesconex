@@ -38,7 +38,7 @@ const Projetos = () => {
     localStorage.setItem('projetosViewType', viewType);
   }, [viewType]);
 
-  const handleAddProjeto = async (nome: string): Promise<void> => {
+  const handleAddProjeto = async (nome: string, isCondominio?: boolean, cnpj?: string, cep?: string, condominioData?: any): Promise<void> => {
     console.log('Empresa UID:', empresaUid);
     
     if (!empresaUid) {
@@ -55,11 +55,26 @@ const Projetos = () => {
       throw new Error('Já existe um projeto com este nome. Por favor, escolha outro nome.');
     }
 
-    const projetoData = {
+    // Dados básicos do projeto
+    const projetoData: any = {
       empresa: empresaUid,
       nome,
       ativo: true
     };
+
+    // Se for um condomínio, adicionar os campos específicos
+    if (isCondominio && condominioData) {
+      console.log('Adicionando dados de condomínio:', condominioData);
+      
+      projetoData.condominio_cnpj = cnpj;
+      projetoData.condominio_cep = condominioData.address?.zip || cep;
+      projetoData.condominio_rua = condominioData.address?.street || '';
+      projetoData.condominio_numero = condominioData.address?.number || '';
+      projetoData.condominio_bairro = condominioData.address?.district || '';
+      projetoData.condominio_cidade = condominioData.address?.city || '';
+      projetoData.condominio_uf = condominioData.address?.state || '';
+      projetoData.condominio_tipo = true; // Marca como condomínio
+    }
 
     console.log('Enviando dados do projeto:', projetoData);
 
